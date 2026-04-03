@@ -6,6 +6,8 @@ import zipfile
 import xml.etree.ElementTree as ET
 from PyPDF2 import PdfReader
 import os
+import datetime # 날짜 기능을 위해 추가
+import time # 재시도를 위해 추가
 
 # 1. 파일 기반 저장소 설정
 DB_FILE = "school_db.txt"
@@ -23,13 +25,13 @@ def load_data():
 # 2. 페이지 설정 및 초기 데이터 로드
 st.set_page_config(page_title="우리반 AI 보조", page_icon="🏫")
 
-# 앱이 시작될 때 파일에서 데이터를 읽어옵니다.
 if "global_context" not in st.session_state:
     st.session_state["global_context"] = load_data()
 
-# [중요] API 설정 (1.5-flash 권장)
+# API 설정 (가장 안정적인 1.5-flash 권장하지만, 일단 현재 설정 유지)
 genai.configure(api_key=st.secrets["DB"])
-model = genai.GenerativeModel('models/gemini-2.5-flash')
+# 팁: 429 에러가 너무 잦다면 'gemini-1.5-flash'로 바꾸는 것이 훨씬 안정적입니다.
+model = genai.GenerativeModel('models/gemma-3-1b-it')
 
 # 3. 사이드바 메뉴
 mode = st.sidebar.radio("모드 선택", ["학생 모드", "선생님 모드"])
@@ -46,7 +48,6 @@ if mode == "선생님 모드":
             file_type = uploaded_file.name.split('.')[-1].lower()
             
             try:
-                # (기존 파일 처리 로직 동일...)
                 if file_type == "hwpx":
                     with zipfile.ZipFile(uploaded_file) as z:
                         xml_files = [f for f in z.namelist() if 'Contents/section' in f]
@@ -67,17 +68,24 @@ if mode == "선생님 모드":
                         new_context += page.extract_text()
 
                 if new_context:
-                    # [핵심] 세션에도 저장하고, 파일에도 저장합니다!
                     st.session_state["global_context"] = new_context
                     save_data(new_context) 
-                    st.success("✅ 서버에 안전하게 저장되었습니다. 이제 웹을 꺼도 유지됩니다!")
+                    st.success("✅ 서버에 안전하게 저장되었습니다!")
             except Exception as e:
                 st.error(f"오류: {e}")
+    elif password != "":
+        st.error("비밀번호가 틀렸습니다.")
 
 else:
-    # 학생 모드
+    # --- 학생 모드 ---
     st.header("🤖 우리반 보조봇")
-    st.info("💡 선생님이 등록하신 최신 정보를 바탕으로 대답합니다.")
+    
+    # 오늘 날짜 정보 생성
+    now = datetime.datetime.now()
+    weekday_list = ['월', '화', '수', '목', '금', '토', '일']
+    current_date = now.strftime(f"%Y년 %m월 %d일({weekday_list[now.weekday()]})")
+    
+    st.info(f"📅 오늘은 **{current_date}** 입니다.")
     
     if "messages" not in st.session_state: st.session_state.messages = []
     for msg in st.session_state.messages: st.chat_message(msg["role"]).write(msg["content"])
@@ -86,12 +94,35 @@ else:
         st.session_state.messages.append({"role": "user", "content": prompt})
         st.chat_message("user").write(prompt)
 
-        # 현재 로드된 데이터를 기반으로 답변
-        full_prompt = f"정보: {st.session_state['global_context']}\n질문: {prompt}\n친절하게 답해줘."
+        # 시스템 프롬프트 구성 (날짜 정보 주입)
+        full_prompt = f"""
+        너는 우리반 학생들을 돕는 친절한 안내봇이야.
+        오늘은 {current_date}이야.
+        제공된 [정보]를 바탕으로 질문에 친절하게 답해줘. 정보에 없는 내용은 선생님께 여쭤보라고 안내해줘.
+
+        [정보]: {st.session_state['global_context']}
+        [질문]: {prompt}
+        """
         
-        try:
-            response = model.generate_content(full_prompt)
-            st.chat_message("assistant").write(response.text)
-            st.session_state.messages.append({"role": "assistant", "content": response.text})
-        except Exception as e:
-            st.error("잠시 후 다시 시도해주세요. (API 사용량 초과 가능성)")
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            # 429 에러 대응을 위한 재시도 로직
+            success = False
+            for i in range(3): # 최대 3번 시도
+                try:
+                    response = model.generate_content(full_prompt)
+                    full_response = response.text
+                    message_placeholder.markdown(full_response)
+                    st.session_state.messages.append({"role": "assistant", "content": full_response})
+                    success = True
+                    break
+                except Exception as e:
+                    if "429" in str(e):
+                        message_placeholder.warning(f"⚠️ 사용자가 많아 대기 중입니다... ({i+1}/3)")
+                        time.sleep(3) # 3초 대기 후 재시도
+                    else:
+                        st.error(f"오류가 발생했습니다: {e}")
+                        break
+            
+            if not success:
+                st.error("🤖: 미안해! 지금 질문이 너무 많아서 대답하기 힘들어. 10초 뒤에 다시 물어봐 줄래?")
