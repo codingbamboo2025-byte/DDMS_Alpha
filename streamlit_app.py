@@ -64,57 +64,46 @@ img_light = get_image_base64("DD (6).png")
 st.markdown(
     """
     <style>
-    /* 상단 여백 최소화 */
-    .block-container {
-        padding-top: 1rem !important;
+    /* 1. 상단 헤더, 하단 푸터, 데코레이션 라인 전체 제거 */
+    header[data-testid="stHeader"], 
+    footer, 
+    .stAppDeployButton, 
+    #MainMenu, 
+    div[data-testid="stDecoration"] {
+        display: none !important;
+        visibility: hidden !important;
     }
-    
-    /* 로고 래퍼 설정 */
+
+    /* 2. 전체 화면 여백 조정 (상단/하단 밀착) */
+    .block-container {
+        padding-top: 0rem !important;
+        padding-bottom: 0rem !important;
+    }
+
+    /* 3. 로고 래퍼 설정 */
     .logo-wrapper {
         display: flex;
         justify-content: center;
         width: 100%;
     }
     
-    /* 이미지 기본 설정 (위아래 여백을 여기서 줄임) */
+    /* 4. 이미지 기본 설정 */
     .theme-logo {
         max-width: 100%;
         margin-top: -20px;
         margin-bottom: -20px;
     }
 
-    /* 다크 모드일 때: 라이트 로고 숨김, 다크 로고 표시 */
+    /* 5. 다크/라이트 모드 대응 로직 */
     @media (prefers-color-scheme: dark) {
         .light-logo { display: none !important; }
         .dark-logo { display: block !important; }
     }
     
-    /* 라이트 모드일 때: 다크 로고 숨김, 라이트 로고 표시 */
     @media (prefers-color-scheme: light) {
         .dark-logo { display: none !important; }
         .light-logo { display: block !important; }
     }
-
-    <style>
-    /* 우측 하단 'Deploy' 버튼 및 메뉴 숨기기 */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    .stAppDeployButton {display: none;}
-    
-    /* 혹시 남아있을 수 있는 하단 바 제거 */
-    header {visibility: hidden;}
-
-    /* 상단 헤더(Share, 메뉴 등) 전체 숨기기 */
-    header[data-testid="stHeader"] {
-        visibility: hidden;
-        height: 0%;
-    }
-
-    /* 우측 하단 배너 및 메뉴 제거 (기존 코드 유지) */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    .stAppDeployButton {display: none;}
-    
     </style>
     """,
     unsafe_allow_html=True
