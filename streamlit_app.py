@@ -16,7 +16,7 @@ DB_FILE = "school_db.txt"
 # 2. 페이지 설정 및 초기 데이터 로드
 st.set_page_config(
     page_title="DDAI",          # 브라우저 탭에 표시될 이름
-    page_icon="DD (7).png",               # 브라우저 탭에 표시될 아이콘 파일 (또는 이모지)
+    page_icon="DD (8).png",               # 브라우저 탭에 표시될 아이콘 파일 (또는 이모지)
     layout="wide"                         # 화면 레이아웃
 )
 
