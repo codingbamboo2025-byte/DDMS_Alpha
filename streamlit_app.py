@@ -64,7 +64,7 @@ img_light = get_image_base64("DD (6).png")
 st.markdown(
     """
     <style>
-    /* 1. 상단 메뉴, 배포 버튼, 무지개 라인 제거 */
+   /* 1. 상단 메뉴바, 배포 버튼, 무지개 장식 선 숨기기 */
     div[data-testid="stHeaderActionElements"], 
     .stAppDeployButton, 
     #MainMenu, 
@@ -72,10 +72,14 @@ st.markdown(
         display: none !important;
     }
 
-    /* 2. 하단 'Manage app', 'Made with Streamlit' 배지 및 푸터 완전 제거 */
-    footer { visibility: hidden !important; height: 0px !important; }
-    
-    /* 접속자 화면에서 보이는 하단 우측 위젯 및 배지 강제 차단 */
+    /* 2. 하단 푸터(Made with Streamlit) 숨기기 */
+    footer { 
+        visibility: hidden !important; 
+        height: 0px !important; 
+    }
+
+    /* 3. 실제 배포 시 나타나는 하단 'Manage app' 및 배지(Badge) 제거 */
+    /* 타 계정이나 시크릿 모드 접속 시 보이는 요소를 모두 차단합니다. */
     [data-testid="stStatusWidget"],
     .st-emotion-cache-zq59db,
     .st-emotion-cache-1gh76i9,
@@ -91,6 +95,16 @@ st.markdown(
         display: none !important;
     }
 
+    /* 4. 상단 헤더 영역 투명화 및 여백 제거 */
+    header[data-testid="stHeader"] {
+        background-color: rgba(0,0,0,0) !important;
+    }
+
+    /* 본문 콘텐츠가 위로 밀착되도록 여백 조정 */
+    .block-container {
+        padding-top: 0rem !important;
+        padding-bottom: 0rem !important;
+    }
   /* 3. [최종 교정] 질문 입력창 테두리 및 빨간색 박멸 */
     
    /* 3. [디자인 복구] 기본 모양 유지 + 클릭 시 하얀색 테두리 */
@@ -126,15 +140,7 @@ st.markdown(
         border: none !important;           /* 안쪽 박스 테두리 제거 */
         background-color: transparent !important;
     }
-    /* 6. 헤더 투명화 및 여백 조정 */
-    header[data-testid="stHeader"] {
-        background-color: rgba(0,0,0,0) !important;
-        visibility: visible !important;
-    }
-    .block-container {
-        padding-top: 0rem !important;
-        padding-bottom: 2rem !important;
-    }
+    
 
     /* 7. 로고 및 테마 대응 */
     .logo-wrapper { display: flex; justify-content: center; width: 100%; }
