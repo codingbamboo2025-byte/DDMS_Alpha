@@ -72,12 +72,25 @@ st.markdown(
         display: none !important;
     }
 
-    /* 2. 하단 메뉴 및 'Deploy' 관련 위젯 완전 박멸 */
+    /* 2. 하단 'Manage app' 및 Streamlit 호스트 위젯 완전 박멸 */
+    /* 시크릿 모드나 타 계정 접속 시 나타나는 하단 바와 아이콘을 타겟팅합니다. */
     footer { visibility: hidden !important; display: none !important; }
-    div[data-testid="stStatusWidget"] { display: none !important; }
-    .st-emotion-cache-1gh76i9, .st-emotion-cache-6q9sum, .st-emotion-cache-p5m072 { 
+    
+    /* 하단 우측의 관리자용 위젯 및 팝업 차단 */
+    div[data-testid="stStatusWidget"],
+    .st-emotion-cache-1gh76i9, 
+    .st-emotion-cache-6q9sum, 
+    .st-emotion-cache-p5m072,
+    .st-emotion-cache-zq59db, 
+    div[class*="viewerBadge"] { 
         display: none !important; 
-    } 
+    }
+
+    /* 하단에 붙는 모든 배지 및 툴바 강제 숨김 */
+    div[data-testid="stConnectionStatus"],
+    iframe[title="Manage app"] {
+        display: none !important;
+    }
 
   /* 3. [최종 교정] 질문 입력창 테두리 및 빨간색 박멸 */
     
