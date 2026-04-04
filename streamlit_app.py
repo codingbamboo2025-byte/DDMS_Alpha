@@ -60,34 +60,40 @@ def get_image_base64(file_path):
 img_dark = get_image_base64("DD (5).png")
 img_light = get_image_base64("DD (6).png")
 
-# 2. CSS 스타일 적용 (완벽한 테마 전환 및 여백 제거)
+# 2. CSS 스타일 적용 (완벽한 테마 전환, 여백 제거 및 Streamlit Cloud 버튼 박멸)
 st.markdown(
     """
     <style>
-   /* 1. 상단 메뉴바, 배포 버튼, 무지개 장식 선 숨기기 */
-    div[data-testid="stHeaderActionElements"], 
+    /* 1. 상단 메뉴바 및 GitHub/Fork 버튼 영역 완전히 숨기기 */
+    header[data-testid="stHeader"] {
+        visibility: hidden !important; 
+        display: none !important;
+    }
+    [data-testid="stToolbar"],
+    [data-testid="stHeaderActionElements"],
     .stAppDeployButton, 
-    #MainMenu, 
-    div[data-testid="stDecoration"] {
+    #MainMenu {
         display: none !important;
     }
 
     /* 2. 하단 푸터(Made with Streamlit) 숨기기 */
     footer { 
         visibility: hidden !important; 
-        height: 0px !important; 
+        display: none !important; 
     }
 
-    /* 3. 실제 배포 시 나타나는 하단 'Manage app' 및 배지(Badge) 제거 */
-    /* 타 계정이나 시크릿 모드 접속 시 보이는 요소를 모두 차단합니다. */
-    [data-testid="stStatusWidget"],
-    .st-emotion-cache-zq59db,
-    .st-emotion-cache-1gh76i9,
+    /* 3. Streamlit Cloud 배포 시 나타나는 하단 뱃지(빨간 종이배) 및 Manage app 버튼 완벽 제거 */
+    .viewerBadge_container__1JCqi,
+    .viewerBadge_link__1S137,
+    div[class^="viewerBadge"],
     div[class*="viewerBadge"],
-    div[class*="StreamlitBadge"],
-    iframe[title="Manage app"] {
+    div[class*="styles_viewerBadge"],
+    iframe[title="Manage app"],
+    [data-testid="stStatusWidget"] {
         display: none !important;
         visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
     }
 
     /* 하단 바 전체 영역 공간 삭제 */
@@ -95,54 +101,37 @@ st.markdown(
         display: none !important;
     }
 
-    /* 4. 상단 헤더 영역 투명화 및 여백 제거 */
-    header[data-testid="stHeader"] {
-        background-color: rgba(0,0,0,0) !important;
-    }
-
-    /* 본문 콘텐츠가 위로 밀착되도록 여백 조정 */
+    /* 상단 헤더가 사라진 자리에 본문이 밀착되도록 여백 조정 */
     .block-container {
-        padding-top: 0rem !important;
+        padding-top: 1rem !important; /* 상단 여백 (필요에 따라 0rem으로 조정) */
         padding-bottom: 0rem !important;
     }
-  /* 3. [최종 교정] 질문 입력창 테두리 및 빨간색 박멸 */
-    
-   /* 3. [디자인 복구] 기본 모양 유지 + 클릭 시 하얀색 테두리 */
-    
-    /* 전체 박스: 테두리를 없애고 기본 배경색이 보이게 설정 */
+
+    /* 4. 질문 입력창 테두리 디자인 복구 및 유지 */
     div[data-testid="stChatInput"] {
-        border: 1px solid rgba(255, 255, 255, 0.1) !important; /* 평상시엔 아주 연한 선 */
-        border-radius: 10px !important;                       /* 기본 둥근 모양 */
-        background-color: #262730 !important;               /* Streamlit 기본 어두운 배경색 */
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 10px !important;
+        background-color: #262730 !important;
     }
-
-    /* 클릭했을 때(포커스) 빨간색 대신 하얀색 선만 표시 */
     div[data-testid="stChatInput"]:focus-within {
-        border-color: #FFFFFF !important;      /* 하얀색 테두리 */
-        box-shadow: 0 0 0 1px #FFFFFF !important; /* 얇은 하얀색 광택 */
+        border-color: #FFFFFF !important;
+        box-shadow: 0 0 0 1px #FFFFFF !important;
     }
-
-    /* 내부 입력창: 빨간색 그림자 및 테두리 완전 제거 */
     div[data-testid="stChatInput"] textarea {
         border: none !important;
         box-shadow: none !important;
         outline: none !important;
-        caret-color: white !important; /* 커서 색상 */
+        caret-color: white !important;
     }
-
-    /* 전송 버튼 아이콘 색상 (선택 사항: 빨간색이면 하얗게 변경) */
     div[data-testid="stChatInput"] button {
         color: white !important;
     }
-    
-    /* [중요] 안쪽 실제 입력창의 빨간색 테두리와 그림자 제거 */
     div[data-testid="stChatInput"] > div {
-        border: none !important;           /* 안쪽 박스 테두리 제거 */
+        border: none !important;
         background-color: transparent !important;
     }
-    
 
-    /* 7. 로고 및 테마 대응 */
+    /* 5. 로고 및 테마 대응 */
     .logo-wrapper { display: flex; justify-content: center; width: 100%; }
     .theme-logo { max-width: 100%; margin-top: -20px; margin-bottom: -20px; }
     @media (prefers-color-scheme: dark) {
