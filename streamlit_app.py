@@ -64,42 +64,73 @@ img_light = get_image_base64("DD (6).png")
 st.markdown(
     """
     <style>
-    /* 1. 상단 헤더, 하단 푸터, 데코레이션 라인 전체 제거 */
-    header[data-testid="stHeader"], 
-    footer, 
+    /* 1. 상단 우측 버튼들 및 무지개 선 숨기기 */
+    div[data-testid="stHeaderActionElements"], 
     .stAppDeployButton, 
     #MainMenu, 
     div[data-testid="stDecoration"] {
         display: none !important;
-        visibility: hidden !important;
     }
 
-    /* 2. 전체 화면 여백 조정 (상단/하단 밀착) */
-    .block-container {
-        padding-top: 0rem !important;
-        padding-bottom: 0rem !important;
+    /* 2. 하단 메뉴 및 'Deploy' 관련 위젯 완전 박멸 */
+    footer { visibility: hidden !important; display: none !important; }
+    div[data-testid="stStatusWidget"] { display: none !important; }
+    .st-emotion-cache-1gh76i9, .st-emotion-cache-6q9sum, .st-emotion-cache-p5m072 { 
+        display: none !important; 
+    } 
+
+  /* 3. [최종 교정] 질문 입력창 테두리 및 빨간색 박멸 */
+    
+   /* 3. [디자인 복구] 기본 모양 유지 + 클릭 시 하얀색 테두리 */
+    
+    /* 전체 박스: 테두리를 없애고 기본 배경색이 보이게 설정 */
+    div[data-testid="stChatInput"] {
+        border: 1px solid rgba(255, 255, 255, 0.1) !important; /* 평상시엔 아주 연한 선 */
+        border-radius: 10px !important;                       /* 기본 둥근 모양 */
+        background-color: #262730 !important;               /* Streamlit 기본 어두운 배경색 */
     }
 
-    /* 3. 로고 래퍼 설정 */
-    .logo-wrapper {
-        display: flex;
-        justify-content: center;
-        width: 100%;
+    /* 클릭했을 때(포커스) 빨간색 대신 하얀색 선만 표시 */
+    div[data-testid="stChatInput"]:focus-within {
+        border-color: #FFFFFF !important;      /* 하얀색 테두리 */
+        box-shadow: 0 0 0 1px #FFFFFF !important; /* 얇은 하얀색 광택 */
+    }
+
+    /* 내부 입력창: 빨간색 그림자 및 테두리 완전 제거 */
+    div[data-testid="stChatInput"] textarea {
+        border: none !important;
+        box-shadow: none !important;
+        outline: none !important;
+        caret-color: white !important; /* 커서 색상 */
+    }
+
+    /* 전송 버튼 아이콘 색상 (선택 사항: 빨간색이면 하얗게 변경) */
+    div[data-testid="stChatInput"] button {
+        color: white !important;
     }
     
-    /* 4. 이미지 기본 설정 */
-    .theme-logo {
-        max-width: 100%;
-        margin-top: -20px;
-        margin-bottom: -20px;
+    /* [중요] 안쪽 실제 입력창의 빨간색 테두리와 그림자 제거 */
+    div[data-testid="stChatInput"] > div {
+        border: none !important;           /* 안쪽 박스 테두리 제거 */
+        background-color: transparent !important;
+    }
+    /* 6. 헤더 투명화 및 여백 조정 */
+    header[data-testid="stHeader"] {
+        background-color: rgba(0,0,0,0) !important;
+        visibility: visible !important;
+    }
+    .block-container {
+        padding-top: 0rem !important;
+        padding-bottom: 2rem !important;
     }
 
-    /* 5. 다크/라이트 모드 대응 로직 */
+    /* 7. 로고 및 테마 대응 */
+    .logo-wrapper { display: flex; justify-content: center; width: 100%; }
+    .theme-logo { max-width: 100%; margin-top: -20px; margin-bottom: -20px; }
     @media (prefers-color-scheme: dark) {
         .light-logo { display: none !important; }
         .dark-logo { display: block !important; }
     }
-    
     @media (prefers-color-scheme: light) {
         .dark-logo { display: none !important; }
         .light-logo { display: block !important; }
@@ -108,7 +139,6 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-
 # 3. 로고 배치 (HTML <img> 태그 직접 사용)
 col1, col2, col3 = st.columns([1, 1, 1]) 
 
@@ -132,7 +162,7 @@ with col2:
 st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True)
 # ==========================================
 # 3. 사이드바 메뉴
-st.sidebar.markdown("### DDAI 메뉴 ver 1.0")
+st.sidebar.markdown("### DDAI 메뉴 alpha 1.0")
 mode = st.sidebar.radio("모드 선택", ["학생 모드 (질문하기)", "선생님 모드 (관리자)"])
 
 if "선생님 모드" in mode:
