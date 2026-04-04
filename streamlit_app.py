@@ -94,6 +94,27 @@ st.markdown(
         .dark-logo { display: none !important; }
         .light-logo { display: block !important; }
     }
+
+    <style>
+    /* 우측 하단 'Deploy' 버튼 및 메뉴 숨기기 */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    .stAppDeployButton {display: none;}
+    
+    /* 혹시 남아있을 수 있는 하단 바 제거 */
+    header {visibility: hidden;}
+
+    /* 상단 헤더(Share, 메뉴 등) 전체 숨기기 */
+    header[data-testid="stHeader"] {
+        visibility: hidden;
+        height: 0%;
+    }
+
+    /* 우측 하단 배너 및 메뉴 제거 (기존 코드 유지) */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    .stAppDeployButton {display: none;}
+    
     </style>
     """,
     unsafe_allow_html=True
