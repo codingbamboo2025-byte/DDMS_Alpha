@@ -64,7 +64,7 @@ img_light = get_image_base64("DD (6).png")
 st.markdown(
     """
     <style>
-    /* 1. 상단 우측 버튼들 및 무지개 선 숨기기 */
+    /* 1. 상단 메뉴, 배포 버튼, 무지개 라인 제거 */
     div[data-testid="stHeaderActionElements"], 
     .stAppDeployButton, 
     #MainMenu, 
@@ -72,23 +72,22 @@ st.markdown(
         display: none !important;
     }
 
-    /* 2. 하단 'Manage app' 및 Streamlit 호스트 위젯 완전 박멸 */
-    /* 시크릿 모드나 타 계정 접속 시 나타나는 하단 바와 아이콘을 타겟팅합니다. */
-    footer { visibility: hidden !important; display: none !important; }
+    /* 2. 하단 'Manage app', 'Made with Streamlit' 배지 및 푸터 완전 제거 */
+    footer { visibility: hidden !important; height: 0px !important; }
     
-    /* 하단 우측의 관리자용 위젯 및 팝업 차단 */
-    div[data-testid="stStatusWidget"],
-    .st-emotion-cache-1gh76i9, 
-    .st-emotion-cache-6q9sum, 
-    .st-emotion-cache-p5m072,
-    .st-emotion-cache-zq59db, 
-    div[class*="viewerBadge"] { 
-        display: none !important; 
+    /* 접속자 화면에서 보이는 하단 우측 위젯 및 배지 강제 차단 */
+    [data-testid="stStatusWidget"],
+    .st-emotion-cache-zq59db,
+    .st-emotion-cache-1gh76i9,
+    div[class*="viewerBadge"],
+    div[class*="StreamlitBadge"],
+    iframe[title="Manage app"] {
+        display: none !important;
+        visibility: hidden !important;
     }
 
-    /* 하단에 붙는 모든 배지 및 툴바 강제 숨김 */
-    div[data-testid="stConnectionStatus"],
-    iframe[title="Manage app"] {
+    /* 하단 바 전체 영역 공간 삭제 */
+    .st-emotion-cache-p5m072 {
         display: none !important;
     }
 
@@ -175,7 +174,7 @@ with col2:
 st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True)
 # ==========================================
 # 3. 사이드바 메뉴
-st.sidebar.markdown("### DDAI 메뉴 alpha 1.2")
+st.sidebar.markdown("### DDAI 메뉴 alpha 1.3")
 mode = st.sidebar.radio("모드 선택", ["학생 모드 (질문하기)", "선생님 모드 (관리자)"])
 
 if "선생님 모드" in mode:
