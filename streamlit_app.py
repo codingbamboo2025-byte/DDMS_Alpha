@@ -124,7 +124,7 @@ with col2:
 st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True)
 # ==========================================
 # 3. 사이드바 메뉴
-st.sidebar.markdown("### DDAI 메뉴")
+st.sidebar.markdown("### DDAI 메뉴 ver 1.0")
 mode = st.sidebar.radio("모드 선택", ["학생 모드 (질문하기)", "선생님 모드 (관리자)"])
 
 if "선생님 모드" in mode:
