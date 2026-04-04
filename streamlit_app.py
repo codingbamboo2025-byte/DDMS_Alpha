@@ -30,8 +30,6 @@ def load_data():
             return f.read()
     return "아직 등록된 학교 정보가 없습니다."
 
-# 2. 페이지 설정 및 초기 데이터 로드
-st.set_page_config(page_title="둔덕중학교 DDMS", page_icon="Tool__1_-removebg-preview (1).png", layout="wide") # 레이아웃을 wide로 설정
 
 if "global_context" not in st.session_state:
     st.session_state["global_context"] = load_data()
