@@ -13,6 +13,13 @@ import base64 # 👈 [중요] 이 줄을 맨 위에 꼭 추가하세요!
 # 1. 파일 기반 저장소 설정
 DB_FILE = "school_db.txt"
 
+# 2. 페이지 설정 및 초기 데이터 로드
+st.set_page_config(
+    page_title="DDAI",          # 브라우저 탭에 표시될 이름
+    page_icon="DD (7).png",               # 브라우저 탭에 표시될 아이콘 파일 (또는 이모지)
+    layout="wide"                         # 화면 레이아웃
+)
+
 def save_data(text):
     with open(DB_FILE, "w", encoding="utf-8") as f:
         f.write(text)
@@ -210,6 +217,7 @@ else:
         {current_date}에 맞는 시간표만 알려주고, 날짜에 맞는 시간표가 없으면 오늘 시간표가 올라오지 않았다고 하고 선생님께 여쭤보라고 안내하기, 다른 시간표는 언급하지 않기.
         날짜가 적혀있지 않은 시간표나 급식은 무시하기.
         사용자와 나눈 모든 대화를 기억하고, 답변에 사용하기.
+        학교관련 일이 아니라도, 요청한 일은 적극적으로 도와주기.
         [학교 정보]: {st.session_state['global_context']}
         [질문]: {prompt}
         """
