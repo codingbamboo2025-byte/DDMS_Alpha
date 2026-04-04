@@ -8,6 +8,7 @@ from PyPDF2 import PdfReader
 import os
 import datetime # 날짜 기능을 위해 추가
 import time # 재시도를 위해 추가
+import base64 # 👈 [중요] 이 줄을 맨 위에 꼭 추가하세요!
 
 # 1. 파일 기반 저장소 설정
 DB_FILE = "school_db.txt"
@@ -40,45 +41,83 @@ except:
 # --- [DESIGN UPDATE] 통합 로고 섹션 (크기 확대 버전) ---
 # ==========================================
 
-# 1. 상단 공백을 더 줄이고 이미지를 꽉 차게 만드는 CSS
+# ==========================================
+# --- [DESIGN UPDATE] 테마 대응 로고 섹션 (버그 수정 완벽판) ---
+# ==========================================
+
+# 1. 이미지를 HTML에 직접 넣기 위해 Base64로 변환하는 함수
+def get_image_base64(file_path):
+    if os.path.exists(file_path):
+        with open(file_path, "rb") as f:
+            return base64.b64encode(f.read()).decode()
+    return ""
+
+img_dark = get_image_base64("DD (5).png")
+img_light = get_image_base64("DD (6).png")
+
+# 2. CSS 스타일 적용 (완벽한 테마 전환 및 여백 제거)
 st.markdown(
     """
     <style>
-    /* 전체 화면 위쪽 여백 제거 */
+    /* 상단 여백 최소화 */
     .block-container {
         padding-top: 1rem !important;
     }
     
-    /* 이미지 컨테이너 설정 */
-    div[data-testid="stImage"] {
+    /* 로고 래퍼 설정 */
+    .logo-wrapper {
         display: flex;
         justify-content: center;
-        margin-top: -20px;
+        width: 100%;
     }
     
-    /* 이미지 크기 조절 시 주변 여백 최소화 */
-    div[data-testid="stImage"] > img {
-        max-width: 100%; /* 칸 너비에 꽉 맞춤 */
+    /* 이미지 기본 설정 (위아래 여백을 여기서 줄임) */
+    .theme-logo {
+        max-width: 100%;
+        margin-top: -20px;
         margin-bottom: -20px;
+    }
+
+    /* 다크 모드일 때: 라이트 로고 숨김, 다크 로고 표시 */
+    @media (prefers-color-scheme: dark) {
+        .light-logo { display: none !important; }
+        .dark-logo { display: block !important; }
+    }
+    
+    /* 라이트 모드일 때: 다크 로고 숨김, 라이트 로고 표시 */
+    @media (prefers-color-scheme: light) {
+        .dark-logo { display: none !important; }
+        .light-logo { display: block !important; }
     }
     </style>
     """,
     unsafe_allow_html=True
 )
 
-# 2. 로고 배치 (가운데 칸 비율을 0.1 : 5 : 0.1 처럼 극단적으로 넓힙니다)
-# 양쪽 숫자가 작을수록 가운데 사진이 들어가는 공간이 넓어집니다.
-col1, col2, col3 = st.columns([5, 5, 5]) 
+# 3. 로고 배치 (HTML <img> 태그 직접 사용)
+col1, col2, col3 = st.columns([1, 1, 1]) 
 
 with col2:
-    # use_container_width=True를 쓰면 설정한 col2 너비에 꽉 차게 커집니다.
-    st.image("DD (4).png", use_container_width=True)
+    if img_dark and img_light:
+        st.markdown(
+            f"""
+            <div class="logo-wrapper">
+                <img class="theme-logo dark-logo" src="data:image/png;base64,{img_dark}">
+                <img class="theme-logo light-logo" src="data:image/png;base64,{img_light}">
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+    else:
+        st.error("파일을 찾을 수 없습니다. 'DD (5).png'와 'DD (6).png' 파일이 올바르게 있는지 확인해주세요.")
+
+
 
 # 구분선 (너무 바짝 붙어있다면 여백용으로 사용)
 st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True)
 # ==========================================
 # 3. 사이드바 메뉴
-st.sidebar.markdown("### DDMS 메뉴")
+st.sidebar.markdown("### DDAI 메뉴")
 mode = st.sidebar.radio("모드 선택", ["학생 모드 (질문하기)", "선생님 모드 (관리자)"])
 
 if "선생님 모드" in mode:
@@ -159,7 +198,7 @@ else:
 
         # 시스템 프롬프트 구성 (날짜 정보 주입)
         full_prompt = f"""
-        너는 둔덕중학교 학생들을 돕는 친절한 안내봇 DDMS야.
+        너는 둔덕중학교 학생들을 돕는 친절한 안내봇 DDAI야.
         학생들은 너를 줄여서 DD 또는 디디라고 부를거야.
         오늘은 {current_date}이야.
         오늘 날짜를 정확히 기억하고 대화에 반영하기.
@@ -170,6 +209,7 @@ else:
         모든 말에 높임말을 사용해줘.
         {current_date}에 맞는 시간표만 알려주고, 날짜에 맞는 시간표가 없으면 오늘 시간표가 올라오지 않았다고 하고 선생님께 여쭤보라고 안내하기, 다른 시간표는 언급하지 않기.
         날짜가 적혀있지 않은 시간표나 급식은 무시하기.
+        사용자와 나눈 모든 대화를 기억하고, 답변에 사용하기.
         [학교 정보]: {st.session_state['global_context']}
         [질문]: {prompt}
         """
