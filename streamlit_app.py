@@ -60,54 +60,64 @@ def get_image_base64(file_path):
 img_dark = get_image_base64("DD (5).png")
 img_light = get_image_base64("DD (6).png")
 
-# 2. CSS 스타일 적용 (완벽한 테마 전환, 여백 제거 및 Streamlit Cloud 버튼 박멸)
+# 2. CSS 스타일 적용 (Streamlit Cloud 버튼/뱃지 강제 박멸 및 테마 대응)
 st.markdown(
     """
     <style>
-    /* 1. 상단 메뉴바 및 GitHub/Fork 버튼 영역 완전히 숨기기 */
-    header[data-testid="stHeader"] {
-        visibility: hidden !important; 
-        display: none !important;
-    }
+    /* ====================================================
+       1. 상단 헤더 & 배포(Deploy) 버튼, 툴바 완벽 제거
+       ==================================================== */
+    header[data-testid="stHeader"], 
     [data-testid="stToolbar"],
     [data-testid="stHeaderActionElements"],
-    .stAppDeployButton, 
+    .stAppDeployButton,
     #MainMenu {
+        visibility: hidden !important; 
         display: none !important;
+        height: 0px !important;
     }
 
-    /* 2. 하단 푸터(Made with Streamlit) 숨기기 */
+    /* ====================================================
+       2. 하단 우측 'Manage app' 및 빨간 뱃지 완전 박멸 (핵심)
+       ==================================================== */
+    /* Streamlit Cloud가 만들어내는 모든 종류의 뱃지 클래스명을 추적해서 파괴합니다 */
+    div[class^="viewerBadge_container"], 
+    div[class^="viewerBadge_link"],
+    div[class^="styles_viewerBadge"],
+    div[class*="viewerBadge"],
+    div[class*="embeddedAppMetaInfoBar"],
+    iframe[title="Manage app"],
+    #st-share-button,
+    #manage-app-button {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        z-index: -9999 !important;
+        pointer-events: none !important;
+    }
+
+    /* 하단 푸터(Made with Streamlit) 제거 */
     footer { 
         visibility: hidden !important; 
         display: none !important; 
     }
 
-    /* 3. Streamlit Cloud 배포 시 나타나는 하단 뱃지(빨간 종이배) 및 Manage app 버튼 완벽 제거 */
-    .viewerBadge_container__1JCqi,
-    .viewerBadge_link__1S137,
-    div[class^="viewerBadge"],
-    div[class*="viewerBadge"],
-    div[class*="styles_viewerBadge"],
-    iframe[title="Manage app"],
-    [data-testid="stStatusWidget"] {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-    }
-
-    /* 하단 바 전체 영역 공간 삭제 */
+    /* 여백으로 생기는 하단 바 제거 */
     .st-emotion-cache-p5m072 {
         display: none !important;
     }
 
-    /* 상단 헤더가 사라진 자리에 본문이 밀착되도록 여백 조정 */
+    /* ====================================================
+       3. 본문 여백 조정 (위쪽 공간을 줄여서 밀착)
+       ==================================================== */
     .block-container {
-        padding-top: 1rem !important; /* 상단 여백 (필요에 따라 0rem으로 조정) */
+        padding-top: 1rem !important; 
         padding-bottom: 0rem !important;
     }
 
-    /* 4. 질문 입력창 테두리 디자인 복구 및 유지 */
+    /* ====================================================
+       4. 질문 입력창 테두리 디자인 및 클릭 효과 복구
+       ==================================================== */
     div[data-testid="stChatInput"] {
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
         border-radius: 10px !important;
@@ -131,7 +141,9 @@ st.markdown(
         background-color: transparent !important;
     }
 
-    /* 5. 로고 및 테마 대응 */
+    /* ====================================================
+       5. 로고 테마(다크/라이트 모드) 대응
+       ==================================================== */
     .logo-wrapper { display: flex; justify-content: center; width: 100%; }
     .theme-logo { max-width: 100%; margin-top: -20px; margin-bottom: -20px; }
     @media (prefers-color-scheme: dark) {
